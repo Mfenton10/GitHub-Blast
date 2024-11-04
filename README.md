@@ -1,2 +1,3 @@
 # GitHub-Blast
-Michael Submission for GitHub Shooter
+Michael F. Submission for GitHub Shooter
+All created/edited by Michael F.
