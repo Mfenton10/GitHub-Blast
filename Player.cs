@@ -1,71 +1,67 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class Player : MonoBehaviour
 {
-    // its access level: public or private
-    // its type: int (5, 8, 36, etc.), float (2.5f, 3.7f, etc.)
-    // its name: speed, playerSpeed --- Speed, PlayerSpeed
-    // optional: give it an initial value 
-    private float speed;
-    private int lives = 3;
-    private int score = 0;
+
     private float horizontalInput;
     private float verticalInput;
-    private Vector3 screenBounds;
+    private float horizontalScreenSize = 11.5f;
+    private float verticalScreenSize = 7.5f;
+    private float speed;
+    private int lives;
 
-    public GameObject Bullet;
+    public GameObject bullet;
+    public TextMeshProUGUI livesText;
 
     // Start is called before the first frame update
     void Start()
     {
-        speed = 5f;
-        screenBounds = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, Camera.main.transform.position.z));
+        speed = 6f;
+        lives = 3;
+        livesText.text = "Lives: " + lives;
     }
 
     // Update is called once per frame
-    void Update()  
+    void Update()
     {
         Movement();
         Shooting();
-        BoundaryCheck();
     }
+
     void Movement()
     {
         horizontalInput = Input.GetAxis("Horizontal");
         verticalInput = Input.GetAxis("Vertical");
-        transform.Translate(new Vector3(horizontalInput, verticalInput, 0) * Time.deltaTime * 5);
-
-        // if (condition) { //do this }
-        // else if (other condition) { //do that }
-        // else { //do this final }
-        if (transform.position.x >= 11f || transform.position.x < -11f)  
+        transform.Translate(new Vector3(horizontalInput, verticalInput,0) * Time.deltaTime * speed);
+        if (transform.position.x > horizontalScreenSize || transform.position.x <= -horizontalScreenSize)
         {
             transform.position = new Vector3(transform.position.x * -1, transform.position.y, 0);
         }
-
-        if (transform.position.y >= 8f || transform.position.y < -8f)
+        if (transform.position.y > verticalScreenSize || transform.position.y < -verticalScreenSize)
         {
             transform.position = new Vector3(transform.position.x, transform.position.y * -1, 0);
         }
-    }  
-    void BoundaryCheck()
-    {
-        Vector3 viewPos = transform.position;
-        viewPos.x = Mathf.Clamp(viewPos.x, screenBounds.x, screenBounds.x * -1);
-        viewPos.y = Mathf.Clamp(viewPos.y, screenBounds.y, screenBounds.y * -1);
-        transform.position = viewPos;
     }
     void Shooting()
     {
-        // if I press Space
-        // I will create a bullet
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            // Create a bullet
-            Instantiate(Bullet, transform.position + new Vector3(0, 1, 0), Quaternion.identity);
+            Instantiate(bullet, transform.position + new Vector3(0, 1, 0), Quaternion.identity);
+        }
+    }
+
+    public void LoseALife()
+    {
+        lives--;
+        //lives -= 1;
+        //lives = lives - 1;
+        if (lives == 0)
+        {
+            Destroy(this.gameObject);
         }
     }
 }

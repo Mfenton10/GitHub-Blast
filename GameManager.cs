@@ -1,19 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
 
     public GameObject player;
-    public GameObject enemy;
-    public GameObject enemy2;
+    public GameObject enemyOne;
+    public GameObject cloud;
+    public GameObject coin;
+    public TextMeshProUGUI scoreText;
+
+    private int score;
 
     // Start is called before the first frame update
     void Start()
     {
         Instantiate(player, transform.position, Quaternion.identity);
-        InvokeRepeating("CreateEnemy", 1f, 3f);
+        InvokeRepeating("CreateEnemyOne", 1f, 3f);
+        InvokeRepeating("CreateCoin", 1f, 1f);
+        CreateSky();
+        score = 0;
+        scoreText.text = "Score: " + score;
     }
 
     // Update is called once per frame
@@ -22,9 +32,27 @@ public class GameManager : MonoBehaviour
         
     }
 
-    void CreateEnemy()
+    void CreateEnemyOne()
     {
-        Instantiate(enemy, new Vector3(Random.Range(-9f, 9f), 15f, 0), Quaternion.identity);
-        Instantiate(enemy2, new Vector3(-12f, Random.Range(-1f, 10f), 0), Quaternion.identity);
+        Instantiate(enemyOne, new Vector3(Random.Range(-9f, 9f), 12f, 0), Quaternion.Euler(0, 0, 180));
+    }
+
+    void CreateSky()
+    {
+        for (int i = 0; i < 30; i++)
+        {
+            Instantiate(cloud, transform.position, Quaternion.identity);
+        }
+    }
+
+    void CreateCoin()
+    {
+        Instantiate(coin, new Vector3(Random.Range(-7f, 7f), 12f, 0), Quaternion.Euler(0, 0, 180));
+    }
+
+    public void EarnScore(int newScore)
+    {
+        score = score + newScore;
+        scoreText.text = "Score: " + score;
     }
 }
