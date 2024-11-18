@@ -13,8 +13,15 @@ public class Player : MonoBehaviour
     private float verticalScreenSize = 7.5f;
     private float speed;
     private int lives;
+    private int shooting;
+    private bool hasShield;
+
+    public GameManager gameManager;
 
     public GameObject bullet;
+    public GameObject explosion;
+    public GameObject thruster;
+    public GameObject shield;
     public TextMeshProUGUI livesText;
 
     // Start is called before the first frame update
@@ -23,6 +30,9 @@ public class Player : MonoBehaviour
         speed = 6f;
         lives = 3;
         livesText.text = "Lives: " + lives;
+        shooting = 1;
+        hasShield = false;
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
     // Update is called once per frame
@@ -56,12 +66,77 @@ public class Player : MonoBehaviour
 
     public void LoseALife()
     {
-        lives--;
-        //lives -= 1;
-        //lives = lives - 1;
+        if (hasShield == false)
+        {
+            lives--;
+        } else if (hasShield == true)
+        {
+            hasShield = false;
+            shield.gameObject.SetActive(false);
+            //lose the shield
+            //no longer have a shield
+        }
+
         if (lives == 0)
         {
+            gameManager.GameOver();
+            Instantiate(explosion, transform.position, Quaternion.identity);
             Destroy(this.gameObject);
+        }
+    }
+
+     IEnumerator SpeedPowerDown()
+    {
+        yield return new WaitForSeconds(3f);
+        speed = 6f;
+        thruster.gameObject.SetActive(false);
+        shield.gameObject.SetActive(false);
+        gameManager.UpdatePowerupText("");
+    }
+
+    IEnumerator ShootingPowerDown()
+    {
+        yield return new WaitForSeconds(3f);
+        shooting = 1;
+        gameManager.UpdatePowerupText("");
+    }
+
+    private void OnTriggerEnter2D(Collider2D whatIHit)
+    {
+        if(whatIHit.tag == "PowerUp")
+        {
+            gameManager.PlayPowerUp();
+            int powerupType = 4; //this can be 1, 2, 3, or 4
+            switch(powerupType)
+            {
+                case 1:
+                    //speed powerup
+                    speed = 9f;
+                    gameManager.UpdatePowerupText("Picked up Speed!");
+                    thruster.gameObject.SetActive(true);
+                    StartCoroutine(SpeedPowerDown());
+                    break;
+                case 2:
+                    //double shot
+                    shooting = 2;
+                    gameManager.UpdatePowerupText("Picked up Double Shot!");
+                    StartCoroutine (ShootingPowerDown());
+                    break;
+                case 3:
+                    //triple shot
+                    shooting = 3;
+                    gameManager.UpdatePowerupText("Picked up Triple Shot!");
+                    StartCoroutine(ShootingPowerDown());
+                    break;
+                case 4:
+                    //shield
+                    gameManager.UpdatePowerupText("Picked up Shield!");
+                    StartCoroutine(SpeedPowerDown());
+                    shield.gameObject.SetActive(true);
+                    hasShield = true;
+                    break;
+            }
+            Destroy(whatIHit.gameObject);
         }
     }
 }

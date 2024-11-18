@@ -32,6 +32,10 @@ public class MovingObject : MonoBehaviour
         {
             //I am the Coin
             transform.Translate(new Vector3(0, 1, 0) * Time.deltaTime * 9f);
+        } else if (whatAmI == 5)
+        {
+            //I am the Powerup
+            transform.Translate(new Vector3(0, -1, 0) * Time.deltaTime * 6f);
         }
 
         if ((transform.position.y > 13f || transform.position.y <= -9f) && whatAmI != 3)
